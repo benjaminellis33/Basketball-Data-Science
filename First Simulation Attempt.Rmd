@@ -1,0 +1,44 @@
+---
+title: "Basketball & Data-Science - First Simulation Attempt"
+author: "Benjamin Ellis"
+date: "2025-04-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(bnlearn)
+```
+Note: Bayesian networks don't like cycles or loops. 
+
+Just Shooting
+```{r}
+NetworkShooting  <- model2network("[StartPoss][Shoot|StartPoss][2PFGA|Shoot][3PFGA|Shoot][2Points|2PFGA][Miss|2PFGA:3PFGA][3Points|3PFGA][OReb|Miss][DReb|Miss][EndPoss|DReb:3Points:2Points]")
+NetworkShooting
+plot(NetworkShooting)
+```
+
+Just Passing
+```{r}
+NetworkPassing <- model2network("[StartPoss][Pass|StartPoss][Shoot|Pass:Dribble][Dribble|Pass][Turnover|Pass][EndPoss|Turnover]")
+NetworkPassing
+plot(NetworkPassing)
+```
+
+Just Dribbling
+```{r}
+NetworkDribbling <- model2network("[StartPoss][Dribble|StartPoss][Turnover|Dribble:Pass][Pass|Dribble][Shoot|Dribble:Pass][EndPoss|Turnover]")
+NetworkDribbling
+plot(NetworkDribbling)
+```
+
+Full Network Attempt (Incomplete)
+```{r}
+Network <- model2network("[StartPoss][EndPoss|Turnover:3Points:2Points:DReb][Dribble|StartPoss][Pass|StartPoss][Turnover|Dribble:Pass][Shoot|StartPoss:Dribble:Pass][2PFGA|Shoot][3PFGA|Shoot][2Points|2PFGA][Miss|2PFGA:3PFGA][3Points|3PFGA][OReb|Miss][DReb|Miss]")
+Network
+plot(Network)
+```
