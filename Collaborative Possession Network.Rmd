@@ -11,6 +11,11 @@ knitr::opts_chunk$set(echo = TRUE)
 Looking to create code for the simulation of a single possesion that roughly follows the Bayesian Network created in the first attempt file. 
 
 ```{r}
+library(tidyverse)
+```
 
-
+```{r}
+start_possession <- runif(1)
+print(start_possession)
+if (start_possession <= 0.33){shoot} else {if (start_possession <= 0.66){dribble} else{pass}}
 ```
