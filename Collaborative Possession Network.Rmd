@@ -8,11 +8,11 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-Looking to create code for the simulation of a single possesion that roughly follows the Bayesian Network created in the first attempt file. 
 
 ```{r}
 library(tidyverse)
 ```
+
 ```{r}
 simulate_possession <- function() {
   possession_log <- c()  
@@ -20,39 +20,41 @@ simulate_possession <- function() {
   start_possession <- runif(1)
 
   if (start_possession <= 0.15) {
-    possession_log <- c(possession_log, "shot")
-    
+    possession_log <- c(possession_log, "Shot")
     shot_type <- runif(1)
 
     if (shot_type <= 0.40) {
       possession_log <- c(possession_log, "3pa")
-      
       shot_result <- runif(1)
+      
       if (shot_result <= 0.33) {
         possession_log <- c(possession_log, "3points", "Possession Over")
+        
       } else {
-        possession_log <- c(possession_log, "miss")
-
+        possession_log <- c(possession_log, "Miss")
         rebound <- runif(1)
+        
         if (rebound <= 0.75) {
           possession_log <- c(possession_log, "Drebound", "Possession Over")
+          
         } else {
           possession_log <- c(possession_log, "Orebound")
         }
       }
     } else {
-
       possession_log <- c(possession_log, "2pa")
-      
       shot_result <- runif(1)
+      
       if (shot_result <= 0.50) {
         possession_log <- c(possession_log, "2points", "Possession Over")
+        
       } else {
-        possession_log <- c(possession_log, "miss")
+        possession_log <- c(possession_log, "Miss")
 
         rebound <- runif(1)
         if (rebound <= 0.75) {
           possession_log <- c(possession_log, "Drebound", "Possession Over")
+          
         } else {
           possession_log <- c(possession_log, "Orebound")
         }
@@ -60,13 +62,158 @@ simulate_possession <- function() {
     }
     
   } else if (start_possession <= 0.56) {
-    possession_log <- c(possession_log, "dribble")
+    possession_log <- c(possession_log, "Dribble")
+    dribble_result <- runif(1)
+    
+    if (dribble_result >=.95){
+      possession_log <- c(possession_log, "Turnover", "Possession Over")
+    } else {
+      after_dribble <- runif(1)
+      if (after_dribble <= 0.40){
+        possession_log <- c(possession_log, "Shot")
+        shot_type <- runif(1)
+
+        if (shot_type <= 0.40) {
+          possession_log <- c(possession_log, "3pa")
+          shot_result <- runif(1)
+      
+          if (shot_result <= 0.33) {
+            possession_log <- c(possession_log, "3points", "Possession Over")
+        
+          } else {
+            possession_log <- c(possession_log, "Miss")
+            rebound <- runif(1)
+        
+            if (rebound <= 0.75) {
+              possession_log <- c(possession_log, "Drebound", "Possession Over")
+          
+            } else {
+              possession_log <- c(possession_log, "Orebound")
+            }
+          }
+        } else {
+          possession_log <- c(possession_log, "2pa")
+          shot_result <- runif(1)
+      
+          if (shot_result <= 0.50) {
+            possession_log <- c(possession_log, "2points", "Possession Over")
+        
+          } else {
+            possession_log <- c(possession_log, "Miss")
+
+            rebound <- runif(1)
+            if (rebound <= 0.75) {
+              possession_log <- c(possession_log, "Drebound", "Possession Over")
+          
+            } else {
+              possession_log <- c(possession_log, "Orebound")
+            }
+          }
+        }
+      } else {
+        possession_log <- c(possession_log, "Pass")
+      }
+    }
     
   } else {
-    possession_log <- c(possession_log, "pass")
+    possession_log <- c(possession_log, "Pass")
   }
   
   return(possession_log)
 }
 simulate_possession()
 ```
+
+Created functions for shot, dribble, and pass. Made it more organized and easier to repeat call the same action during the simulation function. Have not yet added what happens after an Orebound.
+
+```{r}
+shot_function <- function(possession_log) {
+  possession_log <- c(possession_log, "Shot")
+  shot_type <- runif(1)
+
+  if (shot_type <= 0.40) {
+    possession_log <- c(possession_log, "3pa")
+    shot_result <- runif(1)
+
+    if (shot_result <= 0.33) {
+      possession_log <- c(possession_log, "3points", "Possession Over")
+    } else {
+      possession_log <- c(possession_log, "Miss")
+      rebound <- runif(1)
+
+      if (rebound <= 0.75) {
+        possession_log <- c(possession_log, "Drebound", "Possession Over")
+      } else {
+        possession_log <- c(possession_log, "Orebound")
+      }
+    }
+
+  } else {
+    possession_log <- c(possession_log, "2pa")
+    shot_result <- runif(1)
+
+    if (shot_result <= 0.50) {
+      possession_log <- c(possession_log, "2points", "Possession Over")
+    } else {
+      possession_log <- c(possession_log, "Miss")
+      rebound <- runif(1)
+
+      if (rebound <= 0.75) {
+        possession_log <- c(possession_log, "Drebound", "Possession Over")
+      } else {
+        possession_log <- c(possession_log, "Orebound")
+      }
+    }
+  }
+  return(possession_log)
+}
+
+dribble_function <-function(possession_log){
+  possession_log <- c(possession_log, "Dribble")
+  next_action <- runif(1)
+  
+  if (next_action <= 0.10) {
+    possession_log <- c(possession_log, "Turnover", "Possession Over")
+  } else if (next_action <= 0.40) {
+    shot_function(possession_log)
+  } else {
+    pass_function(possession_log)
+  }
+  
+}
+
+pass_function <- function(possession_log){
+  possession_log <- c(possession_log, "Pass")
+  next_action <- runif(1)
+  
+  if (next_action <= 0.10) {
+    possession_log <- c(possession_log, "Turnover", "Possession Over")
+  } else if (next_action <= 0.50) {
+    shot_function(possession_log)
+  } else if (next_action <= 0.80 ){
+    dribble_function(possession_log)
+  } else {
+    pass_function(possession_log)
+  }
+}
+
+simulate_possession <- function() {
+  possession_log <- c()  
+  start_possession <- runif(1)
+
+  if (start_possession <= 0.15) {
+    possession_log <- shot_function(possession_log)
+  } else if (start_possession <= 0.56) {
+    possession_log <- dribble_function(possession_log)
+  } else {
+    possession_log <- pass_function(possession_log)
+  }
+
+  return(possession_log)
+}
+simulate_possession()
+
+```
+
+
+
