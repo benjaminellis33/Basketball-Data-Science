@@ -125,7 +125,7 @@ simulate_possession()
 ```
 
 Created functions for shot, dribble, and pass. Made it more organized and easier to repeat call 
-the same action during the simulation function. Have not yet added what happens after an Orebound.
+the same action during the simulation function. 
 
 ```{r}
 shot_function <- function(possession_log) {
@@ -146,6 +146,13 @@ shot_function <- function(possession_log) {
         possession_log <- c(possession_log, "Drebound", "Possession Over")
       } else {
         possession_log <- c(possession_log, "Orebound")
+        putback_shot <- runif(1)
+        
+        if (putback_shot <=0.60){
+          possession_log <- c(possession_log, "2points", "Possession Over")
+        } else {
+          possession_log <- c(possession_log, "Miss", "Drebound", "Possession Over")
+        }
       }
     }
 
@@ -163,6 +170,13 @@ shot_function <- function(possession_log) {
         possession_log <- c(possession_log, "Drebound", "Possession Over")
       } else {
         possession_log <- c(possession_log, "Orebound")
+        putback_shot <- runif(1)
+        
+        if (putback_shot <=0.60){
+          possession_log <- c(possession_log, "2points", "Possession Over")
+        } else {
+          possession_log <- c(possession_log, "Miss", "Drebound", "Possession Over")
+        }
       }
     }
   }
