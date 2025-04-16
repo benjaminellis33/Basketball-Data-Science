@@ -12,8 +12,61 @@ Looking to create code for the simulation of a single possesion that roughly fol
 
 ```{r}
 library(tidyverse)
+```
+```{r}
+simulate_possession <- function() {
+  possession_log <- c()  
+  
+  start_possession <- runif(1)
 
-start_possession <- runif(1)
-print(start_possession)
-if (start_possession <= 0.33){print('shoot')} else {if (start_possession <= 0.66){print('dribble')} else{print('pass')}}
+  if (start_possession <= 0.15) {
+    possession_log <- c(possession_log, "shot")
+    
+    shot_type <- runif(1)
+
+    if (shot_type <= 0.40) {
+      possession_log <- c(possession_log, "3pa")
+      
+      shot_result <- runif(1)
+      if (shot_result <= 0.33) {
+        possession_log <- c(possession_log, "3points", "Possession Over")
+      } else {
+        possession_log <- c(possession_log, "miss")
+
+        rebound <- runif(1)
+        if (rebound <= 0.75) {
+          possession_log <- c(possession_log, "Drebound", "Possession Over")
+        } else {
+          possession_log <- c(possession_log, "Orebound")
+        }
+      }
+    } else {
+
+      possession_log <- c(possession_log, "2pa")
+      
+      shot_result <- runif(1)
+      if (shot_result <= 0.50) {
+        possession_log <- c(possession_log, "2points", "Possession Over")
+      } else {
+        possession_log <- c(possession_log, "miss")
+
+        rebound <- runif(1)
+        if (rebound <= 0.75) {
+          possession_log <- c(possession_log, "Drebound", "Possession Over")
+        } else {
+          possession_log <- c(possession_log, "Orebound")
+        }
+      }
+    }
+    
+  } else if (start_possession <= 0.56) {
+    possession_log <- c(possession_log, "dribble")
+    
+  } else {
+    possession_log <- c(possession_log, "pass")
+  }
+  
+  return(possession_log)
+}
+simulate_possession()
 ```
