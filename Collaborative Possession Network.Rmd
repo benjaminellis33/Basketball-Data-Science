@@ -12,10 +12,8 @@ Looking to create code for the simulation of a single possesion that roughly fol
 
 ```{r}
 library(tidyverse)
-```
 
-```{r}
 start_possession <- runif(1)
 print(start_possession)
-if (start_possession <= 0.33){shoot} else {if (start_possession <= 0.66){dribble} else{pass}}
+if (start_possession <= 0.33){print('shoot')} else {if (start_possession <= 0.66){print('dribble')} else{print('pass')}}
 ```
