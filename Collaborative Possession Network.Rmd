@@ -124,7 +124,8 @@ simulate_possession <- function() {
 simulate_possession()
 ```
 
-Created functions for shot, dribble, and pass. Made it more organized and easier to repeat call the same action during the simulation function. Have not yet added what happens after an Orebound.
+Created functions for shot, dribble, and pass. Made it more organized and easier to repeat call 
+the same action during the simulation function. Have not yet added what happens after an Orebound.
 
 ```{r}
 shot_function <- function(possession_log) {
