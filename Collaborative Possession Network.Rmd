@@ -13,14 +13,20 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 ```
 
-```{r}
+```{r sim_poss}
+
+# note - often nice to have chunk names for navigation purposes
+
 simulate_possession <- function() {
+    
   possession_log <- c()  
   
   start_possession <- runif(1)
 
   if (start_possession <= 0.15) {
+      
     possession_log <- c(possession_log, "Shot")
+    
     shot_type <- runif(1)
 
     if (shot_type <= 0.40) {
@@ -42,13 +48,16 @@ simulate_possession <- function() {
         }
       }
     } else {
+        
       possession_log <- c(possession_log, "2pa")
+      
       shot_result <- runif(1)
       
       if (shot_result <= 0.50) {
         possession_log <- c(possession_log, "2points", "Possession Over")
         
       } else {
+          
         possession_log <- c(possession_log, "Miss")
 
         rebound <- runif(1)
@@ -62,19 +71,23 @@ simulate_possession <- function() {
     }
     
   } else if (start_possession <= 0.56) {
+      
     possession_log <- c(possession_log, "Dribble")
+    
     dribble_result <- runif(1)
     
     if (dribble_result >=.95){
       possession_log <- c(possession_log, "Turnover", "Possession Over")
     } else {
+        
       after_dribble <- runif(1)
+      
       if (after_dribble <= 0.40){
+          
         possession_log <- c(possession_log, "Shot")
         shot_type <- runif(1)
 
-        if (shot_type <= 0.40) {
-          possession_log <- c(possession_log, "3pa")
+        if (shot_type <= 0.40) {          possession_log <- c(possession_log, "3pa")
           shot_result <- runif(1)
       
           if (shot_result <= 0.33) {
@@ -121,14 +134,36 @@ simulate_possession <- function() {
   
   return(possession_log)
 }
+
 simulate_possession()
+
 ```
+
+```{r test_sim_poss}
+
+# run 1 possession
+simulate_possession()
+
+# run 50 possessions 2 different ways
+
+## for loop
+for(i in 1:50) simulate_possession() %>% print()
+
+## purrr::map()
+1:50 %>% map(~simulate_possession() %>% print())
+
+
+```
+
+
 
 Created functions for shot, dribble, and pass. Made it more organized and easier to repeat call 
 the same action during the simulation function. 
 
-```{r}
+```{r shot}
+
 shot_function <- function(possession_log) {
+    
   possession_log <- c(possession_log, "Shot")
   shot_type <- runif(1)
 
@@ -183,6 +218,11 @@ shot_function <- function(possession_log) {
   return(possession_log)
 }
 
+```
+
+
+```{r dribble}
+
 dribble_function <-function(possession_log){
   possession_log <- c(possession_log, "Dribble")
   next_action <- runif(1)
@@ -196,6 +236,10 @@ dribble_function <-function(possession_log){
   }
   
 }
+
+```
+
+```{r pass}
 
 pass_function <- function(possession_log){
   possession_log <- c(possession_log, "Pass")
@@ -212,23 +256,80 @@ pass_function <- function(possession_log){
   }
 }
 
+```
+
+```{r sim_poss2}
+
 simulate_possession <- function() {
+    
   possession_log <- c()  
   start_possession <- runif(1)
 
   if (start_possession <= 0.15) {
+      
+    # print("shot possession_log")
+    # print(possession_log)
+      
     possession_log <- shot_function(possession_log)
+    
   } else if (start_possession <= 0.56) {
+      
+    # print("dribble possession_log")
+    # print(possession_log)
+      
     possession_log <- dribble_function(possession_log)
+    
   } else {
+      
+    # print("pass possession_log")
+    # print(possession_log)
+      
     possession_log <- pass_function(possession_log)
+    
   }
 
+  # print("posession_log")
+  # print(possession_log)
+  
   return(possession_log)
 }
+
 simulate_possession()
 
 ```
+
+
+```{r purrr_sim}
+
+# 5 possessions
+1:5 %>% map(~simulate_possession() %>% print())
+
+# how many steps in possession
+1:5 %>% map_int(~simulate_possession() %>% length()) 
+
+# lots and lots of possessions
+1:10000 %>% map_int(~simulate_possession() %>% length()) %>% table()
+
+# Q: is it possible to have an infinite possession?
+# Q: are longer possessions more likely to yield points?
+
+```
+
+
+```{r}
+
+# tibbles are convenient ways to work with data
+
+poss <- c("Dribble", "Pass", "Dribble", "Pass", "Dribble", "Pass", "Turnover", "Possession Over")
+tibble(what = poss)
+
+1:5 %>% 
+    map(~tibble(what = simulate_possession())) %>% 
+    bind_rows(.id = "possession")
+
+e
+```
+
 
 
 ```{r}
