@@ -352,6 +352,7 @@ df_sots %>%
     filter(.by = possession, step == max(step) - 1) %>% 
     count(action)
 
+# can a team get more than 1 Oreb on a possession?
 df_shots %>% 
     mutate(.by = possession, step = row_number()) %>% 
     filter(.by = possession, step == max(step) - 2) %>% 
