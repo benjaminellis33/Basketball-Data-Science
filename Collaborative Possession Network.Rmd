@@ -221,6 +221,9 @@ shot_function <- function(possession_log) {
 ```
 
 
+
+
+
 ```{r dribble}
 
 dribble_function <-function(possession_log){
@@ -327,9 +330,90 @@ tibble(what = poss)
     map(~tibble(what = simulate_possession())) %>% 
     bind_rows(.id = "possession")
 
-e
+
 ```
 
+
+
+```{r test_shot}
+
+# this is just me exploring the possible outcomes
+# I drew out the possession network and I think we might be missing some possible pathways
+
+df_shots <- 
+    
+    1:10000 %>% 
+    map(~shot_function(NULL) %>% tibble()) %>% 
+    bind_rows(.id = "possession") %>% 
+    rename(action = 2)
+
+df_sots %>% 
+    mutate(.by = possession, step = row_number()) %>% 
+    filter(.by = possession, step == max(step) - 1) %>% 
+    count(action)
+
+df_shots %>% 
+    mutate(.by = possession, step = row_number()) %>% 
+    filter(.by = possession, step == max(step) - 2) %>% 
+    filter(action == "Orebound") %>% 
+    distinct(possession) %>% 
+    left_join(df_shots) %>% 
+    count(possession, action) %>% 
+    filter(action == "Orebound") %>% 
+    count(n)
+
+df_shots %>% 
+    filter(grepl("Oreb", action)) %>% 
+    distinct(possession) %>% 
+    left_join(df_shots) %>% 
+    
+    View()
+
+df_shots %>% count(action)
+
+```
+
+
+```{r test_dribble}
+
+# just testing again
+
+df_dribble <- 
+    
+    1:10000 %>% 
+    map(~dribble_function(NULL) %>% tibble()) %>% 
+    bind_rows(.id = "possession") %>% 
+    rename(action = 2)
+
+df_dribble %>% 
+    mutate(.by = possession, step = row_number()) %>% 
+    filter(.by = possession, step == max(step) - 1) %>% 
+    count(action)
+
+df_dribble %>% count(action)
+
+```
+
+
+```{r test_dribble}
+
+# testing again
+
+df_pass <- 
+    
+    1:10000 %>% 
+    map(~pass_function(NULL) %>% tibble()) %>% 
+    bind_rows(.id = "possession") %>% 
+    rename(action = 2)
+
+df_pass %>% 
+    mutate(.by = possession, step = row_number()) %>% 
+    filter(.by = possession, step == max(step) - 1) %>% 
+    count(action)
+
+df_pass %>% count(action)
+
+```
 
 
 ```{r}
