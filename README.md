@@ -14,7 +14,7 @@
 
 ## TODO
 
-* Install git and powershell 7
+* Install git and powershell 7 -> or use Mac terminal or R Studio terminal
 * Setup, practice Github
 * Add parameters to functions 
     * Red Devils shooting % may be different than bad guys
