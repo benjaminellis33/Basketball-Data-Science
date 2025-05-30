@@ -84,7 +84,8 @@ input_pr_reb <- 0.37
 
 # function inputs (for testing and developing)
 # in the final app, this will be in the function as below
-.n_poss = input_n_poss
+# .n_poss = input_n_poss
+.poss = 1:input_n_poss
 .pr_to = input_pr_to
 .pr_take2 = input_pr_take2
 .pr_make2 = input_pr_make2
@@ -151,6 +152,9 @@ df1 %>% filter(!to & !make & reb)
 # need to extend possession if reb
 df1.2 <- sim_simple(.poss = df1 %>% filter(!to & !make & reb) %>% pull(possession))
 
+
+sim_simple(.poss = df1.2 %>% filter(!to & !make & reb) %>% pull(possession), .pr_make2 = 0.2, .pr_make3 = 0.1)
+
 # repeat until no longer have ball ...
 df1.2 %>% filter(!to & !make & reb)
 df1.3 <- sim_simple(.poss = df1.2 %>% filter(!to & !make & reb) %>% pull(possession))
@@ -189,11 +193,32 @@ df1 %>%
 
 
 
+for(i in 1:100){
+    print(sim_simple() %>% summarise(pts = sum(pts)))
+} 
+
+df_pts <- 1:1000 %>% map(~sim_simple() %>% summarise(pts = sum(pts))) %>% bind_rows(.id = "game")
+
+df_pts %>% 
+    ggplot() + 
+    geom_histogram(aes(x = pts))
 
 
-
-
-
-
-
-
+df_pts %>% 
+    summarise(
+        
+        n = n(),
+        mean = mean(pts),
+        sd = sd(pts),
+        se = sd / sqrt(n),
+        
+        # most of my observations will be in this range
+        # should see this visually in the plot
+        mean_minus_2sd = mean - 2 * sd,
+        mean_plus_2sd = mean + 2 * sd,
+        
+        # the true mean is likely in this interval
+        lcl = mean - 2*se,
+        ucl = mean + 2*se
+        
+    )
