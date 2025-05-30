@@ -1,5 +1,11 @@
 
+# libraries ----
+
 library(tidyverse)
+
+
+
+# while loop ----
 
 # caution - while loops can explode!
 
@@ -7,12 +13,10 @@ possession <- TRUE
 clock <- 0
 eop <- 0.2 # end of possession
 
-
 while(possession == TRUE){ # run until team no longer has possession
     
     # simulate
     random_number <- runif(n = 1)
-    
     
     if(random_number < eop) possession <- FALSE
     
@@ -24,9 +28,10 @@ while(possession == TRUE){ # run until team no longer has possession
     
 }
 
-
-
 # Q: is there a better approach?  Vectorized approach?  Matrix approach?
+
+
+# vector approach ----
 
 # shiny app inputs input_xyz
 input_n_poss <- 60 # number of possessions
@@ -59,21 +64,13 @@ df_simple <-
 
 df_simple
 
-df_simple %>% 
-    
-    summarise(
-        
-        to = sum(to),
-        pts = sum(pts)
-        
-    )
+df_simple %>% summarise(to = sum(to), pts = sum(pts))
 
 
 # would need to know if team got rebound; continue possession
 df_simple %>% filter(!to & !make)
 
-
-
+# vector function ----
 
 # let's make a function for the simple approach
 
@@ -93,8 +90,6 @@ input_pr_reb <- 0.37
 .pr_make2 = input_pr_make2
 .pr_make3 = input_pr_make3
 .pr_reb = input_pr_reb
-
-
 
 sim_simple <- 
     
@@ -146,8 +141,9 @@ sim_simple <-
 df1 <- sim_simple()
 
 df1
-
 df1 %>% summarise(to = sum(to), pts = sum(pts))
+
+# continue poss ----
 
 # would need to know if team got rebound; continue possession
 df1 %>% filter(!to & !make & reb)
@@ -161,16 +157,33 @@ df1.3 <- sim_simple(.poss = df1.2 %>% filter(!to & !make & reb) %>% pull(possess
 df1.3 %>% filter(!to & !make & reb)
 
 # combine
-bind_rows(df1, df1.2, df1.3)
-
+df1 <- bind_rows(df1, df1.2, df1.3)
 
 # Note: will not know how many times required to do this!   Make generic...
 
+# some outputs
 
+df1 %>% 
+    filter(!to) %>% 
+    summarise(
+        .by = take,
+        n = n(),
+        make = sum(make),
+        percent = make / n
+    )
+
+df1 %>% 
+    
+    summarise(
+        to = sum(to),
+        pts = sum(pts),
+        reb = sum(reb)
+    )
     
 
 
-
+# NOTE: this is for one team for one game!  
+# Will need for both teams for ex: 1000 games!
 
 
 
