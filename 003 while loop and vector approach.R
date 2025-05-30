@@ -28,7 +28,7 @@ while(possession == TRUE){ # run until team no longer has possession
 
 # Q: is there a better approach?  Vectorized approach?  Matrix approach?
 
-
+# shiny app inputs input_xyz
 input_n_poss <- 60 # number of possessions
 input_pr_to <- 0.25 # prob turn over
 input_pr_take <- 0.6 # 60% 2 pt; 40% 3 pt
@@ -57,13 +57,7 @@ df_simple <-
     mutate(pts = score * take)
 
 
-
-
-
 df_simple
-
-
-
 
 df_simple %>% 
     
@@ -73,6 +67,107 @@ df_simple %>%
         pts = sum(pts)
         
     )
+
+
+# would need to know if team got rebound; continue possession
+df_simple %>% filter(!to & !make)
+
+
+
+
+# let's make a function for the simple approach
+
+# shiny app inputs
+input_n_poss <- 60 # number of possessions
+input_pr_to <- 0.25 # prob turn over
+input_pr_take2 <- 0.6 # 60% 2 pt; 40% 3 pt
+input_pr_make2 <- 0.40
+input_pr_make3 <- 0.20
+input_pr_reb <- 0.37
+
+# function inputs (for testing and developing)
+# in the final app, this will be in the function as below
+.n_poss = input_n_poss
+.pr_to = input_pr_to
+.pr_take2 = input_pr_take2
+.pr_make2 = input_pr_make2
+.pr_make3 = input_pr_make3
+.pr_reb = input_pr_reb
+
+
+
+sim_simple <- 
+    
+    function(
+        
+        .poss = 1:input_n_poss,
+        .pr_to = input_pr_to,
+        .pr_take2 = input_pr_take2,
+        .pr_make2 = input_pr_make2,
+        .pr_make3 = input_pr_make3,
+        .pr_reb = input_pr_reb
+        
+    ){
+       
+        .n_poss <- length(.poss)
+        
+        .df <- 
+            
+            # tibble(possession = 1:.n_poss) %>% 
+            tibble(possession = .poss) %>% 
+            
+            # turnover
+            mutate(rand_to = runif(n = .n_poss)) %>% 
+            mutate(to = rand_to < .pr_to) %>% 
+            
+            # shot (2 vs 3)
+            mutate(rand_take = runif(n = .n_poss)) %>% 
+            mutate(take = ifelse(rand_take < .pr_take2, 2, 3)) %>% 
+            
+            # make
+            mutate(rand_make = runif(n = .n_poss)) %>% 
+            mutate(make = ifelse(rand_take == 2, rand_make < .pr_make2, rand_make < .pr_make3)) %>% 
+            
+            # didn't turn the ball over AND made a shot
+            # i.e. scored (pts)
+            mutate(score = !to & make) %>% 
+            mutate(pts = score * take) %>% 
+            
+            # didn't turn ball over but missed shot
+            mutate(rand_reb = runif(n = .n_poss)) %>% 
+            mutate(reb = rand_reb < .pr_reb)
+        
+        return(.df)
+        
+    }
+
+
+
+df1 <- sim_simple()
+
+df1
+
+df1 %>% summarise(to = sum(to), pts = sum(pts))
+
+# would need to know if team got rebound; continue possession
+df1 %>% filter(!to & !make & reb)
+
+# need to extend possession if reb
+df1.2 <- sim_simple(.poss = df1 %>% filter(!to & !make & reb) %>% pull(possession))
+
+# repeat until no longer have ball ...
+df1.2 %>% filter(!to & !make & reb)
+df1.3 <- sim_simple(.poss = df1.2 %>% filter(!to & !make & reb) %>% pull(possession))
+df1.3 %>% filter(!to & !make & reb)
+
+# combine
+bind_rows(df1, df1.2, df1.3)
+
+
+# Note: will not know how many times required to do this!   Make generic...
+
+
+    
 
 
 
